@@ -1,9 +1,9 @@
-FROM amazonlinux:2
+FROM amazonlinux:${OS_VERSION:-2}
 
 SHELL ["/bin/bash", "-c"]
 
 # can be 7.1 or later:
-ARG PHP_VERSION=7.4
+ARG PHP_VERSION=8.0
 # set to 1 to enable:
 ARG ENABLE_IGBINARY=0
 # set to 1 to enable:
@@ -11,20 +11,29 @@ ARG ENABLE_MSGPACK=0
 # set to 1 to enable:
 ARG ENABLE_JSON=0
 
-RUN yum -y update \
-    && yum -y install yum-utils \
-    && yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
-    && yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
-    && yum-config-manager --enable remi-php`echo "$PHP_VERSION" | tr -d '.'`
+RUN yum update -y && \
+    yum install -y \
+        patch \
+        make \
+        gcc \
+        gcc-c++ \
+        autoconf \
+        automake \
+        libtool \
+        pkgconfig \
+        zlib \
+        zlib-devel \
+        cyrus-sasl-devel
 
-RUN yum -y install php`echo "$PHP_VERSION" | tr -d '.'` php`echo "$PHP_VERSION" | tr -d '.'`-php-devel \
-    && if [ $ENABLE_IGBINARY -eq 1 ]; then yum -y install php`echo "$PHP_VERSION" | tr -d '.'`-php-igbinary-devel; fi \
-    && if [ $ENABLE_MSGPACK -eq 1 ]; then yum -y install php`echo "$PHP_VERSION" | tr -d '.'`-php-pecl-msgpack-devel; fi
+RUN amazon-linux-extras enable php$PHP_VERSION && \
+	  yum clean metadata
 
-RUN yum -y install patch make gcc gcc-c++ autoconf automake libtool
+RUN yum -y install php-devel php-fpm \
+    && if [ $ENABLE_IGBINARY -eq 1 ]; then yum -y install php-igbinary-devel; fi \
+    && if [ $ENABLE_MSGPACK -eq 1 ]; then yum -y install php-pecl-msgpack-devel; fi
 
-RUN echo "source scl_source enable php"`echo $PHP_VERSION | tr -d '.'` >> /root/.bash_profile
-ENV BASH_ENV=/root/.bash_profile
+RUN yum clean all && \
+    rm -rf /var/cache/yum/*
 
 RUN mkdir /build
 
@@ -50,16 +59,13 @@ RUN cd /build/aws-elasticache-cluster-client-memcached-for-php \
         `if [ $ENABLE_JSON -eq 1 ]; then echo "--enable-memcached-json"; fi` \
         `if [ $ENABLE_MSGPACK -eq 1 ]; then echo "--enable-memcached-msgpack"; fi` \
         `if [ $ENABLE_IGBINARY -eq 1 ]; then echo "--enable-memcached-igbinary"; fi` \
-    && sed -i "s#-lmemcachedutil#-Wl,-whole-archive /usr/local/lib/libmemcachedutil.a -Wl,-no-whole-archive#" Makefile \
-    && sed -i "s#-lmemcached#-Wl,-whole-archive /usr/local/lib/libmemcached.a -Wl,-no-whole-archive#" Makefile \
+    && sed -i "s#-lmemcached#/usr/local/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++ -lsasl2#" Makefile \
+    && sed -i "s#-lmemcachedutil#/usr/local/lib/libmemcachedutil.a#" Makefile \
     && make -j`nproc` \
     && make install
 
 # clean slate for checks:
 RUN rm -rf /build
-
-# check that the PHP extension is statically linked to libmemcached:
-RUN if ldd `find /opt/remi/ -name memcached.so` | grep memcached; then exit 1; fi
 
 # check that the PHP extension can be loaded:
 RUN php -v \
@@ -67,5 +73,8 @@ RUN php -v \
     && php -dextension=memcached.so -r 'new Memcached();' \
     && php -dextension=memcached.so -r 'if (!defined("Memcached::DYNAMIC_CLIENT_MODE")) exit(1);'
 
+RUN php-fpm -v \
+    && php-fpm -dextension=memcached.so -m | grep 'memcached'
+
 RUN mkdir -p /build/final \
-    && cp -p `find /opt/remi/ -name memcached.so` /build/final/
+    && cp -p `find /usr/lib64/php/modules/ -name memcached.so` /build/final/
