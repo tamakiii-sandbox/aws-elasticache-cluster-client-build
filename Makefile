@@ -25,29 +25,29 @@ aws-elasticache-cluster-client-memcached-for-php:
 	git submodule update --init $@
 
 /usr/local/lib/pkgconfig/libmemcached.pc:
-	cd /build/aws-elasticache-cluster-client-libmemcached \
-    && for F in /build/*.patch; do patch -p1 -i "$$F"; done \
-    && autoreconf -i \
-    && mkdir BUILD \
-    && cd BUILD \
-    && ../configure --prefix=/usr/local --with-pic --disable-sasl \
-    && make -j`nproc` \
-    && make install
+	cd /build/aws-elasticache-cluster-client-libmemcached && \
+    for F in /build/*.patch; do patch -p1 -i "$$F"; done && \
+    autoreconf -i && \
+    mkdir BUILD && \
+    cd BUILD && \
+    ../configure --prefix=/usr/local --with-pic --disable-sasl && \
+    make -j`nproc` && \
+    make install
 
 /usr/lib64/php/modules/memcached.so:
-	cd /build/aws-elasticache-cluster-client-memcached-for-php \
-			&& phpize \
-			&& ./configure \
+	cd /build/aws-elasticache-cluster-client-memcached-for-php && \
+			phpize && \
+			./configure \
 			--with-pic \
 			--disable-memcached-sasl \
 			--enable-memcached-session \
 			`if [ $(ENABLE_JSON) -eq 1 ]; then echo "--enable-memcached-json"; fi` \
 			`if [ $(ENABLE_MSGPACK) -eq 1 ]; then echo "--enable-memcached-msgpack"; fi` \
 			`if [ $(ENABLE_IGBINARY) -eq 1 ]; then echo "--enable-memcached-igbinary"; fi` \
-			&& sed -i "s#-lmemcached#/usr/local/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++ -lsasl2#" Makefile \
-			&& sed -i "s#-lmemcachedutil#/usr/local/lib/libmemcachedutil.a#" Makefile \
-			&& make -j`nproc` \
-			&& make install
+			sed -i "s#-lmemcached#/usr/local/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++ -lsasl2#" Makefile && \
+			sed -i "s#-lmemcachedutil#/usr/local/lib/libmemcachedutil.a#" Makefile && \
+			make -j`nproc` && \
+			make install
 
 dist/memcached.so: | dist
 	cp -p /usr/lib64/php/modules/memcached.so $@
