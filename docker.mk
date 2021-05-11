@@ -1,4 +1,4 @@
-.PHONY: help info build login clean
+.PHONY: help info build-all build login clean
 
 export OS_VERSION ?= 2
 
@@ -22,9 +22,12 @@ help:
 info:
 	docker buildx ls
 
-build: \
+build-all: \
 	dist/memcached.x86_64.so \
 	dist/memcached.aarch64.so
+
+build: \
+	dist/memcached.$(ARCHITECTURE).so
 
 login: | dist/$(ARCHITECTURE).docker
 	docker run -it --rm -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $|) bash

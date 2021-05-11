@@ -7,7 +7,7 @@ This repository is fork of [https://github.com/Planerio/aws-elasticache-cluster-
 ## How to use
 ```sh
 make setup
-make -f docker.mk build
+make -f docker.mk build # or build-all
 ls -lsa dist/*.so
 ```
 ```sh
