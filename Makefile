@@ -64,7 +64,6 @@ check:
 	php-fpm -dextension=memcached.so -m | grep 'memcached'
 
 clean:
-	rm -rf aws-elasticache-cluster-client-libmemcached
-	rm -rf aws-elasticache-cluster-client-memcached-for-php
-	rm -rf /build/aws-elasticache-cluster-client-libmemcached/configure
-	rm -rf /build/aws-elasticache-cluster-client-libmemcached/BUILD
+	rm -rf /usr/local/lib/pkgconfig/libmemcached.pc
+	rm -rf /usr/lib64/php/modules/memcached.so
+	rm -rf dist/memcached.so
