@@ -2,7 +2,8 @@ FROM amazonlinux:${OS_VERSION:-2}
 
 SHELL ["/bin/bash", "-c"]
 
-# can be 7.1 or later:
+# can be 7.2 or later:
+# $ amazon-linux-extras list | grep '\sphp[0-9]\.[0-9]'
 ARG PHP_VERSION=8.0
 # set to 1 to enable:
 ARG ENABLE_IGBINARY=0
