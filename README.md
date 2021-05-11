@@ -6,14 +6,18 @@ This repository is fork of [https://github.com/Planerio/aws-elasticache-cluster-
 
 ## How to use
 ```sh
-make build
+make setup
+make -f docker.mk build
 ls -lsa dist/*.so
+```
+```sh
+make -f docker.mk
 make clean
 ```
 
 ## Options
 ```sh
-make build \
+make -f docker.mk build \
   OS_VERSION=2.0.20210126.0 \
   PHP_VERSION=7.4 \
   ENABLE_IGBINARY=1 \

@@ -11,7 +11,7 @@ build: \
 		/usr/local/lib/pkgconfig/libmemcached.pc \
 		/usr/lib64/php/modules/memcached.so \
 		check \
-		/build/final
+		dist/memcached.so
 
 aws-elasticache-cluster-client-libmemcached:
 	git submodule update --init $@
@@ -44,8 +44,8 @@ aws-elasticache-cluster-client-memcached-for-php:
 			&& make -j`nproc` \
 			&& make install
 
-/build/final/memcached.so: | /build/final
-	cp -p `find /usr/lib64/php/modules/ -name memcached.so` $|
+dist/memcached.so: | /build/final
+	cp -p /usr/lib64/php/modules/memcached.so $@
 
 /build/final:
 	-mkdir $@

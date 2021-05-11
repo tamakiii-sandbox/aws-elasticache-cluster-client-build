@@ -1,4 +1,4 @@
-.PHONY: help setup info build clean
+.PHONY: help info build login clean
 
 export OS_VERSION ?= 2
 
@@ -23,24 +23,24 @@ info:
 	docker buildx ls
 
 build: \
-	dist/memcached.amazonlinux2.x86_64.so \
-	dist/memcached.amazonlinux2.aarch64.so
+	dist/memcached.x86_64.so \
+	dist/memcached.aarch64.so
 
-login: | dist/amazonlinux2.$(ARCHITECTURE).docker
+login: | dist/$(ARCHITECTURE).docker
 	docker run -it --rm -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $|) bash
 
-dist/memcached.amazonlinux2.x86_64.so: dist/amazonlinux2.x86_64.docker | dist
+dist/memcached.x86_64.so: dist/x86_64.docker | dist
 	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build
-	docker cp $$(docker create $$(cat $<)):/build/final/memcached.so $@
+	mv dist/memcached.so $@
 
-dist/memcached.amazonlinux2.aarch64.so: dist/amazonlinux2.aarch64.docker | dist
+dist/memcached.aarch64.so: dist/aarch64.docker | dist
 	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build
-	docker cp $$(docker create $$(cat $<)):/build/final/memcached.so $@
+	mv dist/memcached.so $@
 
-dist/amazonlinux2.x86_64.docker: Dockerfile.amazonlinux2 | dist
+dist/x86_64.docker: Dockerfile | dist
 	docker build -f $< --iidfile=$@ --platform=linux/amd64 $(foreach a,$(BUILD_ARGS),--build-arg $a) .
 
-dist/amazonlinux2.aarch64.docker: Dockerfile.amazonlinux2 | dist
+dist/aarch64.docker: Dockerfile | dist
 	docker build -f $< --iidfile=$@ --platform=linux/arm64 $(foreach a,$(BUILD_ARGS),--build-arg $a) .
 
 dist:
