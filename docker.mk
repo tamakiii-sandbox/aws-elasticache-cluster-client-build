@@ -1,5 +1,8 @@
 .PHONY: help info build-all build login clean
 
+DIR_WORK := /local/aws-elasticache-cluster-client-build
+ARCHITECTURE := $(shell uname -m)
+
 export OS_VERSION ?= 2
 
 export PHP_VERSION ?= 8.0
@@ -8,13 +11,12 @@ export ENABLE_MSGPACK ?= 0
 export ENABLE_JSON ?= 0
 
 BUILD_ARGS := \
+	OS_VERSION=$(OS_VERSION) \
 	PHP_VERSION=$(PHP_VERSION) \
 	ENABLE_IGBINARY=$(ENABLE_IGBINARY) \
 	ENABLE_MSGPACK=$(ENABLE_MSGPACK) \
 	ENABLE_JSON=$(ENABLE_JSON)
 
-DIR_WORK := /local/aws-elasticache-cluster-client-build
-ARCHITECTURE := $(shell uname -m)
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))
@@ -33,11 +35,11 @@ login: | dist/$(ARCHITECTURE).docker
 	docker run -it --rm -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $|) bash
 
 dist/memcached.x86_64.so: dist/x86_64.docker | dist
-	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build
+	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build $(BUILD_ARGS)
 	mv dist/memcached.so $@
 
 dist/memcached.aarch64.so: dist/aarch64.docker | dist
-	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build
+	docker run -v $(realpath .):$(DIR_WORK) -w $(DIR_WORK) $$(cat $<) make build $(BUILD_ARGS)
 	mv dist/memcached.so $@
 
 dist/x86_64.docker: Dockerfile | dist
