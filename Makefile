@@ -44,7 +44,7 @@ aws-elasticache-cluster-client-memcached-for-php:
 			&& make -j`nproc` \
 			&& make install
 
-dist/memcached.so: | /build/final
+dist/memcached.so: | dist
 	cp -p /usr/lib64/php/modules/memcached.so $@
 
 /build/final:
@@ -63,4 +63,3 @@ clean:
 	rm -rf aws-elasticache-cluster-client-memcached-for-php
 	rm -rf /build/aws-elasticache-cluster-client-libmemcached/configure
 	rm -rf /build/aws-elasticache-cluster-client-libmemcached/BUILD
-
