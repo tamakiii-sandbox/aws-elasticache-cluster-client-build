@@ -36,9 +36,9 @@ aws-elasticache-cluster-client-memcached-for-php:
 			--with-pic \
 			--disable-memcached-sasl \
 			--enable-memcached-session \
-			`if [ $ENABLE_JSON -eq 1 ]; then echo "--enable-memcached-json"; fi` \
-			`if [ $ENABLE_MSGPACK -eq 1 ]; then echo "--enable-memcached-msgpack"; fi` \
-			`if [ $ENABLE_IGBINARY -eq 1 ]; then echo "--enable-memcached-igbinary"; fi` \
+			`if [ $(ENABLE_JSON) -eq 1 ]; then echo "--enable-memcached-json"; fi` \
+			`if [ $(ENABLE_MSGPACK) -eq 1 ]; then echo "--enable-memcached-msgpack"; fi` \
+			`if [ $(ENABLE_IGBINARY) -eq 1 ]; then echo "--enable-memcached-igbinary"; fi` \
 			&& sed -i "s#-lmemcached#/usr/local/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++ -lsasl2#" Makefile \
 			&& sed -i "s#-lmemcachedutil#/usr/local/lib/libmemcachedutil.a#" Makefile \
 			&& make -j`nproc` \
