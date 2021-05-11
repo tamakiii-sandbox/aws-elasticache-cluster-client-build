@@ -1,4 +1,4 @@
-FROM amazonlinux:${OS_VERSION:-2}
+FROM amazonlinux:2
 
 SHELL ["/bin/bash", "-c"]
 

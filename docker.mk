@@ -3,15 +3,12 @@
 DIR_WORK := /local/aws-elasticache-cluster-client-build
 ARCHITECTURE := $(shell uname -m)
 
-export OS_VERSION ?= 2
-
 export PHP_VERSION ?= 8.0
 export ENABLE_JSON ?= 0
 export ENABLE_MSGPACK ?= 0
 export ENABLE_IGBINARY ?= 0
 
 BUILD_ARGS := \
-	OS_VERSION=$(OS_VERSION) \
 	PHP_VERSION=$(PHP_VERSION) \
 	ENABLE_IGBINARY=$(ENABLE_IGBINARY) \
 	ENABLE_MSGPACK=$(ENABLE_MSGPACK) \
