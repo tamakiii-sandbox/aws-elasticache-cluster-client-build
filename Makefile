@@ -1,9 +1,8 @@
 .PHONY: help setup build check clean
 
-export PHP_VERSION ?= 8.0
-export ENABLE_IGBINARY ?= 0
-export ENABLE_MSGPACK ?= 0
 export ENABLE_JSON ?= 0
+export ENABLE_MSGPACK ?= 0
+export ENABLE_IGBINARY ?= 0
 
 help:
 	@cat $(firstword $(MAKEFILE_LIST))

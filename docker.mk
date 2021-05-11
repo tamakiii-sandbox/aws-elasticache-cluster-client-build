@@ -6,9 +6,9 @@ ARCHITECTURE := $(shell uname -m)
 export OS_VERSION ?= 2
 
 export PHP_VERSION ?= 8.0
-export ENABLE_IGBINARY ?= 0
-export ENABLE_MSGPACK ?= 0
 export ENABLE_JSON ?= 0
+export ENABLE_MSGPACK ?= 0
+export ENABLE_IGBINARY ?= 0
 
 BUILD_ARGS := \
 	OS_VERSION=$(OS_VERSION) \
